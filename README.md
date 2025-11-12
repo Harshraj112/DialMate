@@ -1,9 +1,9 @@
-# RingAI
+# DialMate
 
 > **“Knock on every door — one will open.”**  
-> In business, you’ve probably heard that if you keep knocking, eventually a door will open. RingAI applies the same idea at scale: instead of one person calling a few numbers, the system automates thousands of meaningful voice interactions so the right person picks up, engages, and converts. That scale — combined with AI that listens and replies naturally — turns many tiny knocks into opportunity.
+> In business, you’ve probably heard that if you keep knocking, eventually a door will open. DialMate applies the same idea at scale: instead of one person calling a few numbers, the system automates thousands of meaningful voice interactions so the right person picks up, engages, and converts. That scale — combined with AI that listens and replies naturally — turns many tiny knocks into opportunity.
 
-RingAI is a Node.js application that uses **Twilio** to make automated outbound calls and handle interactive voice responses. It can:
+DialMate is a Node.js application that uses **Twilio** to make automated outbound calls and handle interactive voice responses. It can:
 
 - Trigger outbound calls to any phone number.
 - Play voice prompts and gather speech input.
@@ -48,8 +48,8 @@ RingAI is a Node.js application that uses **Twilio** to make automated outbound 
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/RingAI.git
-cd RingAI
+git clone https://github.com/your-username/DialMate.git
+cd DialMate
 
 # Install dependencies
 npm install
