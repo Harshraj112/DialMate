@@ -9,6 +9,7 @@
   "author": "Harsh Raj",
   "license": "ISC",
   "dependencies": {
+    "@deepgram/sdk": "^4.11.2",
     "@google-cloud/speech": "^7.2.1",
     "@google-cloud/text-to-speech": "^6.4.0",
     "axios": "^1.13.2",
@@ -16,7 +17,13 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-async-handler": "^1.2.0",
-    "openai": "^6.8.1",
+    "form-data": "^4.0.4",
+    "fs": "^0.0.1-security",
+    "mongoose": "^8.19.4",
+    "mulaw-js": "^1.0.1",
+    "nodemon": "^3.1.11",
+    "openai": "^6.9.0",
+    "stream": "^0.0.3",
     "twilio": "^5.10.5",
     "ws": "^8.18.3"
   }

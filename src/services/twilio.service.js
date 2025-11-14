@@ -28,19 +28,23 @@ class TwilioService {
     const VoiceResponse = twilio.twiml.VoiceResponse;
     const response = new VoiceResponse();
 
-    const gather = response.gather({
-        input: 'speech',
-        action: '/api/webhooks/speech-input',
-        language: 'en-US',
-        speechTimeout: 'auto'
-    });
+    response.say("Hello! This is a test call.");
+    res.type('text/xml').send(response.toString());
 
-    gather.say({
-        voice: 'Polly.Joanna'
-    }, message || 'Please tell me how I can help you today.');
+    console.log(config.server.baseUrl);
+    // const gather = response.gather({
+    //     input: 'speech',
+    //     action: `${config.server.baseUrl}/api/webhooks/speech-input`,
+    //     language: 'en-US',
+    //     speechTimeout: 'auto'
+    // });
 
-    return response.toString();
-    }
+    // gather.say({
+    //     voice: 'alice'
+    // }, message || 'Please tell me how I can help you today.');
+
+    // return response.toString();
+  }
 
 
   // Start media stream for real-time audio

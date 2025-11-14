@@ -1,36 +1,34 @@
 const twilioService = require('../services/twilio.service');
 const config = require('../config');
 const asyncHandler = require('express-async-handler');
+const twilio = require('twilio');
 
 class CallController {
 
-  // Make outbound call
+  //-------------------------------------------------------
+  // 1️⃣ MAKE OUTBOUND CALL
+  //-------------------------------------------------------
   makeOutboundCall = asyncHandler(async (req, res) => {
-    console.log('\n📞 [makeOutboundCall] Request received at /api/calls');
+    console.log('\n📞 [makeOutboundCall] Request received');
     console.log('Request body:', req.body);
 
     const { phoneNumber, campaign } = req.body;
 
-    // Validate phone number
     if (!phoneNumber || !/^\+?\d{10,15}$/.test(phoneNumber)) {
-      console.log('❌ Invalid phone number:', phoneNumber);
       const err = new Error('Invalid phone number');
       err.statusCode = 400;
-      throw err; // Goes to global error handler
+      throw err;
     }
 
-    console.log('✅ Phone number valid:', phoneNumber);
     console.log('📢 Campaign:', campaign);
 
-    const callbackUrl = `${config.server.baseUrl}/api/calls/incoming`;
-    console.log('🔁 Callback URL:', callbackUrl);
+    // This URL will return TwiML with media stream
+    const twimlCallback = `${config.server.baseUrl}/api/calls/outbound-twiml?campaign=${campaign}`;
 
-    console.log('📤 Initiating call via Twilio...');
-    const call = await twilioService.makeCall(phoneNumber, callbackUrl);
+    console.log('🔁 TwiML callback URL:', twimlCallback);
 
-    console.log('✅ Twilio call initiated successfully!');
-    console.log('🆔 Call SID:', call.sid);
-    console.log('📶 Call Status:', call.status);
+    // Call Twilio via twilioService
+    const call = await twilioService.makeCall(phoneNumber, twimlCallback);
 
     res.json({
       success: true,
@@ -39,19 +37,54 @@ class CallController {
     });
   });
 
-  // Handle incoming call
-  handleIncomingCall = asyncHandler(async (req, res) => {
-    console.log('\n📞 [handleIncomingCall] Incoming call webhook hit');
-    console.log('Incoming From:', req.body.From);
-    console.log('Incoming To:', req.body.To);
 
-    const twiml = twilioService.generateTwiML(
-      'Hi! I’m your AI assistant. Please tell me how I can help you today.'
-    );
 
-    console.log('🧠 Responding with TwiML...');
+  //-------------------------------------------------------
+  // 2️⃣ TWIML FOR OUTBOUND CALL (MEDIA STREAM STARTS HERE)
+  //-------------------------------------------------------
+  outboundTwiml = asyncHandler(async (req, res) => {
+    console.log('\n📡 [outboundTwiml] Generating TwiML for outbound stream');
+    const callSid = req.query.CallSid || req.body.CallSid;
+
+    const twiml = new twilio.twiml.VoiceResponse();
+
+    const start = twiml.start();
+    start.stream({
+      url: `${config.server.wsUrl}/media?callSid=${callSid}`,
+      track: 'both_tracks'
+    });
+
+    // Keep call open for 60 seconds — your WebSocket will drive the conversation
+    twiml.pause({ length: 60 });
+
     res.type('text/xml');
-    res.send(twiml);
+    res.send(twiml.toString());
+  });
+
+
+
+  //-------------------------------------------------------
+  // 3️⃣ HANDLE INBOUND CALL (ALSO STARTS MEDIA STREAM)
+  //-------------------------------------------------------
+  handleIncomingCall = asyncHandler(async (req, res) => {
+    console.log('\n📞 [handleIncomingCall] Incoming call detected');
+    console.log('Caller:', req.body.From);
+
+    const callSid = req.body.CallSid;
+
+    const twiml = new twilio.twiml.VoiceResponse();
+
+    const start = twiml.start();
+    start.stream({
+      url: `${config.server.wsUrl}/media?callSid=${callSid}`,
+      track: "both_tracks"
+    });
+
+    // AI will speak using TTS from websocket side
+    twiml.pause({ length: 60 });
+
+    res.type('text/xml');
+    res.send(twiml.toString());
   });
 }
 
